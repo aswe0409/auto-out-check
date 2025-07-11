@@ -12,12 +12,19 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 import io
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_ACCOUNT_FILE")
+FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+
+
 # 1️⃣ 서비스 계정 키 파일 경로
-SERVICE_ACCOUNT_FILE = 'attendance.json'
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
-# 2️⃣ 폴더 ID
-FOLDER_ID = '1Gh6asWqyBrB7cZjOrzzvBeyyyMqrlADf'
 
 # 3️⃣ 인증 및 서비스 객체 생성
 creds = service_account.Credentials.from_service_account_file(
@@ -137,5 +144,4 @@ if missed:
     )
     message = f"🔔 **미퇴근 인원 알림**\n{mention_text}"
 
-    discord_url = 'https://discord.com/api/webhooks/1392709336551260241/N51cXLQvjwip3CtvFRzbZXp4xi8Y6HIz9mNDaJpZOre2OdR9mO2G9a27pQtv4lp-MnrJ'
-    requests.post(discord_url, json={"content": message})
+    requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
