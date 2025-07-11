@@ -8,7 +8,7 @@ import re
 import requests
 
 from google.oauth2 import service_account
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build 
 from googleapiclient.http import MediaIoBaseDownload
 import io
 
@@ -22,16 +22,16 @@ FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 
-# 1️⃣ 서비스 계정 키 파일 경로
+# 1️ 서비스 계정 키 파일 경로
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 
-# 3️⃣ 인증 및 서비스 객체 생성
+# 3️ 인증 및 서비스 객체 생성
 creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 drive_service = build('drive', 'v3', credentials=creds)
 
-# 4️⃣ 폴더 내 이미지 검색 (최신 1개)
+# 4️ 폴더 내 이미지 검색 (최신 1개)
 results = drive_service.files().list(
     q=f"'{FOLDER_ID}' in parents and mimeType contains 'image/'",
     pageSize=1,
@@ -41,7 +41,7 @@ results = drive_service.files().list(
 
 items = results.get('files', [])
 if not items:
-    print("📂 이미지 파일이 없습니다.")
+    print("이미지 파일이 없습니다.")
 else:
     file_id = items[0]['id']
     file_name = 'out.jpg'
@@ -54,7 +54,7 @@ else:
     while not done:
         status, done = downloader.next_chunk()
 
-    print(f"✅ 최신 이미지 다운로드 완료: {file_name}")
+    print(f" 최신 이미지 다운로드 완료: {file_name}")
 
 names = [
     "권보민", "김아영", "김태연", "김현지", "원승현",
@@ -67,18 +67,18 @@ discord_ids = {
     "김아영": "100000000000000002",
     "김태연": "100000000000000003",
     "김현지": "100000000000000004",
-    "김혜은": "361811213379829770", # TODO: 아이디 수정 해야 댐
-    "박준현": "100000000000000006",
-    "박찬혁": "100000000000000007",
+    "김혜은": "361811213379829770",
+    "박준현": "1356053613243400292",
+    "박찬혁": "482846122860347403",
     "신은혜": "777218848499695647",
     "원승현": "361811213379829770",
     "유수상": "100000000000000009",
-    "윤소정": "100000000000000010",
-    "이나연": "100000000000000011",
+    "윤소정": "1356050491032862752",
+    "이나연": "793689538982969346",
     "이수진": "100000000000000012",
     "이지연": "100000000000000013",
     "정석영": "289402609154916353",
-    "정재영": "100000000000000015",
+    "정재영": "877438605918883871",
     "정하영": "1322826848178278434",
     "한상준": "593761341748150273",
     "홍원준": "100000000000000018"
@@ -87,7 +87,6 @@ discord_ids = {
 
 # 이미지 열기
 image = Image.open("out.jpg")
-# pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
 
 #(left, upper, right, lower)
 areas = [
@@ -138,10 +137,10 @@ missed = df[df['퇴근상태'] == '미퇴근']['이름'].tolist()
 
 # 미퇴근자 있을 경우에만 디스코드 알림
 if missed:
-    # 이름 → 디스코드 ID로 변환해서 멘션 생성
+
     mention_text = "\n".join(
-        [f"<@{discord_ids[name]}> 님, 입퇴실 꼭 찍어주세요!" for name in missed if name in discord_ids]
+        [f"<@{discord_ids[name]}> 님, ❗**퇴실**❗ 꼭 찍어주세요!" for name in missed if name in discord_ids]
     )
-    message = f"🔔 **미퇴근 인원 알림**\n{mention_text}"
+    message = f" **미퇴근 인원 알림**\n{mention_text}"
 
     requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
